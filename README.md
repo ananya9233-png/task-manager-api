@@ -25,23 +25,6 @@ Built using Node.js, Express, Firestore, and JWT.
 - Firestore Database Integration
 - Password Hashing with bcrypt
 
-## Project Structure
-Task-manager/
-│
-├── config/
-│ └── firebase.js
-│
-├── middleware/
-│ └── authMiddleware.js
-│
-├── routes/
-│ ├── auth.js
-│ └── tasks.js
-│
-├── server.js
-├── .gitignore
-└── package.json
-
 ##  Setup Instructions
 1. Clone the repository
 git clone https://github.com/your-username/task-manager-api.git
