@@ -4,7 +4,6 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 
-// CORS must be first, before anything else
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
