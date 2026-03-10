@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task Manager - Edit Task</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    nav {
+      background-color: white;
+      padding: 14px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    nav h1 {
+      font-size: 1.2rem;
+      color: #4361ee;
+      font-weight: 600;
+    }
+
+    .back-link {
+      font-size: 0.875rem;
+      color: #4361ee;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .page-heading {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 4px;
+    }
+
+    .task-id {
+      font-size: 0.75rem;
+      color: #aaa;
+      margin-bottom: 22px;
+      font-family: monospace;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 26px 28px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #4361ee;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 13px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fafafa;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #4361ee;
+    }
+
+    .checkbox-row span {
+      font-size: 0.875rem;
+      color: #444;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .save-btn {
+      flex: 1;
+      padding: 11px;
+      background-color: #4361ee;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .save-btn:hover {
+      background-color: #3451d1;
+    }
+
+    .save-btn:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+
+    .delete-btn {
+      padding: 11px 20px;
+      background-color: white;
+      color: #d32f2f;
+      border: 1px solid #ffcdd2;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background-color: #fff0f0;
+    }
+
+    .msg {
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.83rem;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .msg.error {
+      background-color: #fff0f0;
+      color: #d32f2f;
+      border: 1px solid #ffcdd2;
+      display: block;
+    }
+
+    .msg.success {
+      background-color: #f0fff4;
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
+      display: block;
+    }
+
+    .meta-card {
+      background: white;
+      border-radius: 8px;
+      padding: 18px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      font-size: 0.82rem;
+      color: #888;
+      line-height: 1.9;
+    }
+
+    #loading-text {
+      text-align: center;
+      padding: 60px 20px;
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <h1>📋 Task Manager</h1>
+  <a class="back-link" href="dashboard.html">← Back to Dashboard</a>
+</nav>
+
+<div class="container">
+
+  <div id="loading-text">Loading task...</div>
+
+  <div id="main-content" style="display: none;">
+
+    <div class="page-heading">Edit Task</div>
+    <div class="task-id" id="task-id-text"></div>
+
+    <div class="card">
+      <div class="form-group">
+        <label for="edit-title">Title *</label>
+        <input type="text" id="edit-title" placeholder="Task title" />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-desc">Description</label>
+        <textarea id="edit-desc" placeholder="Add more details (optional)"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-priority">Priority</label>
+        <select id="edit-priority">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-due">Due Date</label>
+        <input type="date" id="edit-due" />
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <div class="checkbox-row">
+          <input type="checkbox" id="edit-completed" />
+          <span>Mark as completed</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="save-btn" id="save-btn" onclick="saveTask()">Save Changes</button>
+        <button class="delete-btn" onclick="deleteTask()">Delete</button>
+      </div>
+
+      <div class="msg" id="edit-msg"></div>
+    </div>
+
+    <div class="meta-card">
+      <div>Created: <span id="meta-created">-</span></div>
+      <div>Last Updated: <span id="meta-updated">-</span></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    window.location.href = 'index.html';
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const taskId = params.get('id');
+
+  if (!taskId) {
+    window.location.href = 'dashboard.html';
+  }
+
+  function getHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    };
+  }
+
+  function showMsg(text, type) {
+    const el = document.getElementById('edit-msg');
+    el.textContent = text;
+    el.className = 'msg ' + type;
+  }
+
+  function formatDate(ts) {
+    if (!ts) return '-';
+    var d = ts._seconds ? new Date(ts._seconds * 1000) : new Date(ts);
+    return d.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+  }
+
+  async function loadTask() {
+    try {
+      const response = await fetch(API + '/tasks/' + taskId, { headers: getHeaders() });
+
+      if (response.status === 401) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      if (response.status === 404) {
+        document.getElementById('loading-text').textContent = 'Task not found.';
+        return;
+      }
+
+      const data = await response.json();
+      const task = data.task;
+
+      document.getElementById('task-id-text').textContent = 'Task ID: ' + taskId;
+      document.getElementById('edit-title').value = task.title || '';
+      document.getElementById('edit-desc').value = task.description || '';
+      document.getElementById('edit-priority').value = task.priority || 'medium';
+      document.getElementById('edit-completed').checked = task.completed || false;
+
+      if (task.dueDate) {
+        var d = task.dueDate._seconds ? new Date(task.dueDate._seconds * 1000) : new Date(task.dueDate);
+        document.getElementById('edit-due').value = d.toISOString().split('T')[0];
+      }
+
+      document.getElementById('meta-created').textContent = formatDate(task.createdAt);
+      document.getElementById('meta-updated').textContent = formatDate(task.updatedAt);
+
+      document.getElementById('loading-text').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+
+    } catch (err) {
+      document.getElementById('loading-text').textContent = 'Failed to load task. Check server connection.';
+    }
+  }
+
+  async function saveTask() {
+    const title = document.getElementById('edit-title').value.trim();
+    const desc = document.getElementById('edit-desc').value.trim();
+    const priority = document.getElementById('edit-priority').value;
+    const completed = document.getElementById('edit-completed').checked;
+    const dueDate = document.getElementById('edit-due').value;
+
+    if (!title) {
+      showMsg('Title cannot be empty.', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    try {
+      const response = await fetch(API + '/tasks/' + taskId, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify({
+          title: title,
+          description: desc,
+          priority: priority,
+          completed: completed,
+          dueDate: dueDate || null
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showMsg(data.message || 'Failed to update task.', 'error');
+        return;
+      }
+
+      showMsg('Task updated successfully!', 'success');
+      setTimeout(function() { window.location.href = 'dashboard.html'; }, 1200);
+
+    } catch (err) {
+      showMsg('Server error. Please try again.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Save Changes';
+    }
+  }
+
+  async function deleteTask() {
+    if (!confirm('Delete this task? This cannot be undone.')) return;
+
+    try {
+      await fetch(API + '/tasks/' + taskId, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      showMsg('Could not delete task.', 'error');
+    }
+  }
+
+  loadTask();
+</script>
+
+</body>
+</html>

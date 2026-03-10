@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task Manager - Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: white;
+      padding: 40px 36px;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .card h2 {
+      text-align: center;
+      margin-bottom: 6px;
+      font-size: 1.5rem;
+      color: #222;
+    }
+
+    .card p.subtitle {
+      text-align: center;
+      color: #888;
+      font-size: 0.875rem;
+      margin-bottom: 28px;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #e0e0e0;
+      margin-bottom: 24px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      border: none;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #999;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn.active {
+      color: #4361ee;
+      border-bottom-color: #4361ee;
+    }
+
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #444;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: #4361ee;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 11px;
+      background-color: #4361ee;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      background-color: #3451d1;
+    }
+
+    .btn:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+
+    .msg {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .msg.error {
+      background-color: #fff0f0;
+      color: #d32f2f;
+      border: 1px solid #ffcdd2;
+      display: block;
+    }
+
+    .msg.success {
+      background-color: #f0fff4;
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Task Manager</h2>
+  <p class="subtitle">Manage your daily tasks easily</p>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+    <button class="tab-btn" onclick="switchTab('register')">Register</button>
+  </div>
+
+  <!-- Login Form -->
+  <div class="form-section active" id="login-panel">
+    <div class="form-group">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" placeholder="Enter your email" />
+    </div>
+    <div class="form-group">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" placeholder="Enter your password" />
+    </div>
+    <button class="btn" id="login-btn" onclick="handleLogin()">Login</button>
+    <div class="msg" id="login-msg"></div>
+  </div>
+
+  <!-- Register Form -->
+  <div class="form-section" id="register-panel">
+    <div class="form-group">
+      <label for="reg-name">Full Name</label>
+      <input type="text" id="reg-name" placeholder="Enter your name" />
+    </div>
+    <div class="form-group">
+      <label for="reg-email">Email</label>
+      <input type="email" id="reg-email" placeholder="Enter your email" />
+    </div>
+    <div class="form-group">
+      <label for="reg-password">Password</label>
+      <input type="password" id="reg-password" placeholder="Min 6 characters" />
+    </div>
+    <button class="btn" id="reg-btn" onclick="handleRegister()">Create Account</button>
+    <div class="msg" id="reg-msg"></div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+
+  // redirect if already logged in
+  if (localStorage.getItem('token')) {
+    window.location.href = 'dashboard.html';
+  }
+
+  function switchTab(tab) {
+    document.getElementById('login-panel').classList.toggle('active', tab === 'login');
+    document.getElementById('register-panel').classList.toggle('active', tab === 'register');
+    document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+      btn.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+    });
+  }
+
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'msg ' + type;
+  }
+
+  async function handleLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if (!email || !password) {
+      showMsg('login-msg', 'Please fill in all fields.', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+
+    try {
+      const response = await fetch(API + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showMsg('login-msg', data.message || 'Login failed.', 'error');
+        return;
+      }
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      window.location.href = 'dashboard.html';
+
+    } catch (err) {
+      showMsg('login-msg', 'Cannot connect to server. Make sure the backend is running.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Login';
+    }
+  }
+
+  async function handleRegister() {
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+
+    if (!name || !email || !password) {
+      showMsg('reg-msg', 'All fields are required.', 'error');
+      return;
+    }
+
+    if (password.length < 6) {
+      showMsg('reg-msg', 'Password must be at least 6 characters.', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('reg-btn');
+    btn.disabled = true;
+    btn.textContent = 'Creating...';
+
+    try {
+      const response = await fetch(API + '/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, email: email, password: password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showMsg('reg-msg', data.message || 'Registration failed.', 'error');
+        return;
+      }
+
+      showMsg('reg-msg', 'Account created successfully! You can now login.', 'success');
+      setTimeout(function() { switchTab('login'); }, 1500);
+
+    } catch (err) {
+      showMsg('reg-msg', 'Cannot connect to server. Make sure the backend is running.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+    }
+  }
+
+  // allow Enter key to submit
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      if (document.getElementById('login-panel').classList.contains('active')) {
+        handleLogin();
+      } else {
+        handleRegister();
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
